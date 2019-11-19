@@ -4,9 +4,13 @@ using UnityEngine;
 
 public class Butterfly : MonoBehaviour
 {
+    //Global butterfly restrictions
+    static float maxVelocityLimit = 0.5f;
+    static float minVelocityLimit = -0.5f;
+
     //Velocity handling
-    float xVel;
-    float yVel;
+    public float xVel;
+    public float yVel;
     public float drag;
     public float gravity;
 
@@ -47,10 +51,18 @@ public class Butterfly : MonoBehaviour
 
     void VelocityHandler()
     {
+        //Restriction on butterfly max speed
+        xVel = Mathf.Clamp(xVel, minVelocityLimit, maxVelocityLimit);
+        yVel = Mathf.Clamp(yVel, minVelocityLimit, maxVelocityLimit);
+
         transform.position += transform.forward * xVel;
         transform.position += transform.up * yVel;
 
-        if(xVel > 0)
+        //if!touching ground
+
+        yVel -= gravity;
+
+        if (xVel > 0)
         {
             xVel -= drag;
 
@@ -59,15 +71,15 @@ public class Butterfly : MonoBehaviour
 
         }
 
-        //if!touching ground
-
-        yVel -= gravity;
+      
 
 
     }
 
     void Flap()
     {
+        yVel = 0;
+
         yVel += flapY;
         xVel += flapX;
     }

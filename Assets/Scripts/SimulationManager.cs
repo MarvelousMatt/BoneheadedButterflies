@@ -6,6 +6,10 @@ public class SimulationManager : MonoBehaviour
 {
     //Intended to store informaiton about the simulation as well as spawning new butterflies and killing off old ones
 
+    //Max velocity
+    //Breed points required
+
+
     // Start is called before the first frame update
     void Start()
     {

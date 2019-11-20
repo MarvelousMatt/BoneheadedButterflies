@@ -8,9 +8,16 @@ public class Butterfly : MonoBehaviour
     //Player control values
     bool isPlayer = false;
 
+    [Header("Global Restrictions")]
     //Global butterfly restrictions ( will move to sim manager in future)
     float maxVelocityLimit = 0.5f;
     float minVelocityLimit = -0.5f;
+
+    public float flapTimeVariation = 0.5f;
+
+    //Chance for the butterfly to not turn every frame while wandering
+    [Range(0, 100)]
+    public float wanderNoTurnChance = 98;
 
     //How many breed points are needed to enter the breed state (will move to sim manager in future)
     int breedPointsNeeded = 3;
@@ -48,7 +55,8 @@ public class Butterfly : MonoBehaviour
     //How full the butterfly's stomach is
     public int stomachFill;
 
-    
+    //bool that decides whether the wandering butterfly is turning left or right
+    public bool right;
 
     //Current breed points
     public int breedPoints;
@@ -59,9 +67,14 @@ public class Butterfly : MonoBehaviour
     //How often the butterfly flaps
     public float currentFlapTime;
 
+
+
+
     // Start is called before the first frame update
     void Start()
     {
+        StartCoroutine(FlapTimer());
+
         //Manipulate colour later
 
 
@@ -80,6 +93,7 @@ public class Butterfly : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.P))
         {
             isPlayer = !isPlayer;
+            
         }
 
         //Swapping between player and AI input
@@ -124,6 +138,7 @@ public class Butterfly : MonoBehaviour
         switch (state)
         {
             case State.wander:
+                Wander();
                 break;
             case State.targeting:
                 break;
@@ -137,8 +152,24 @@ public class Butterfly : MonoBehaviour
     //Random flapping and turning until the butterfly sees something interesting
     void Wander()
     {
-        StopAllCoroutines();
         currentFlapTime = wanderFlapFreq;
+
+        if (right)
+        {
+            transform.Rotate(new Vector3(0, rotSpeed, 0));
+        }
+        else
+        {
+            transform.Rotate(new Vector3(0, -rotSpeed, 0));
+        }
+
+        if (Random.Range(0, 100) > wanderNoTurnChance)
+        {
+            right = !right;
+        }
+        
+
+
     }
 
     //Flaps and turns towards the object that's marked as a target
@@ -164,7 +195,7 @@ public class Butterfly : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(currentFlapTime);
+            yield return new WaitForSeconds(currentFlapTime + Random.Range(-flapTimeVariation,flapTimeVariation) );
             Flap();
         }
     }

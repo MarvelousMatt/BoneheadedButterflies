@@ -60,6 +60,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe62de8ddb8402a4ca6fc181c0d2cfa4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  flapTimeVariation: 0.5
+  wanderNoTurnChance: 98
   xVel: 0
   yVel: 0
   drag: 0.001
@@ -67,6 +69,18 @@ MonoBehaviour:
   flapY: 7.73
   flapX: 1.37
   rotSpeed: 1
+  stomachCapactity: 0
+  wanderFlapFreq: 1.5
+  targetingFlapBelowFreq: 0
+  targetingFlapAboveFreq: 0
+  wingColour: {r: 0.70522445, g: 0.037646834, b: 0.8867924, a: 0}
+  visionRange: 0
+  state: 0
+  stomachFill: 0
+  right: 0
+  breedPoints: 0
+  currentTarget: {fileID: 0}
+  currentFlapTime: 0
 --- !u!54 &3100161186661010972
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -222,7 +236,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d0c6aeea1f6947f4091c0eab7b48452b, type: 3}
+  - {fileID: 2100000, guid: 52f3f30fc46af7f4d907d1bc9dc22459, type: 2}
   - {fileID: 2100000, guid: 9f1aabaac8882eb45a2db6e8b13c9297, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0

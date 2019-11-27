@@ -195,7 +195,8 @@ public class Butterfly : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(currentFlapTime + Random.Range(-flapTimeVariation,flapTimeVariation) );
+            //Extra 0.1f is added to balance out max being exclusive
+            yield return new WaitForSeconds(currentFlapTime + Random.Range(-flapTimeVariation,flapTimeVariation + 0.1f) );
             Flap();
         }
     }

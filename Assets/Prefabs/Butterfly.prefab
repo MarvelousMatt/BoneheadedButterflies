@@ -60,7 +60,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe62de8ddb8402a4ca6fc181c0d2cfa4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flapTimeVariation: 0.5
+  flapTimeVariation: 0.8
   wanderNoTurnChance: 98
   xVel: 0
   yVel: 0

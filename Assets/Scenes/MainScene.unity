@@ -385,11 +385,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3100161186661010963, guid: 1822d8eca1e0a9d458cbfd118392278d,
-        type: 3}
-      propertyPath: flapTimeVariation
-      value: 0.8
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1822d8eca1e0a9d458cbfd118392278d, type: 3}
 --- !u!1001 &6096194097594120171

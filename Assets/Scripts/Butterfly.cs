@@ -67,6 +67,8 @@ public class Butterfly : MonoBehaviour
     //How often the butterfly flaps
     public float currentFlapTime;
 
+    VisionSphere vision;
+
 
 
 
@@ -77,6 +79,7 @@ public class Butterfly : MonoBehaviour
 
         //Manipulate colour later
 
+        vision = transform.GetComponentInChildren<VisionSphere>();
 
         //Colour application for wings
         Renderer rend = transform.GetChild(0).GetComponent<Renderer>();
@@ -141,6 +144,7 @@ public class Butterfly : MonoBehaviour
                 Wander();
                 break;
             case State.targeting:
+                Targeting();
                 break;
             case State.feeding:
                 break;
@@ -152,6 +156,7 @@ public class Butterfly : MonoBehaviour
     //Random flapping and turning until the butterfly sees something interesting
     void Wander()
     {
+
         currentFlapTime = wanderFlapFreq;
 
         if (right)
@@ -167,15 +172,31 @@ public class Butterfly : MonoBehaviour
         {
             right = !right;
         }
-        
 
-
+        if(vision.RequestTarget(breedPoints <= breedPointsNeeded) != null)
+        {
+            currentTarget = vision.RequestTarget(breedPoints <= breedPointsNeeded);
+            state = State.targeting;
+        }
     }
 
     //Flaps and turns towards the object that's marked as a target
     void Targeting()
     {
+        Quaternion rotStore = transform.rotation;
+        transform.LookAt(currentTarget.transform.position);
+        transform.SetPositionAndRotation(transform.position, new Quaternion(rotStore.x, transform.rotation.y, rotStore.z, transform.rotation.w));
 
+        if (transform.position.y > currentTarget.transform.position.y)
+        {
+            currentFlapTime = targetingFlapAboveFreq;
+        }
+        else
+        {
+            currentFlapTime = targetingFlapBelowFreq;
+        }
+
+        
     }
 
     //Sitting still and then taking off after eating

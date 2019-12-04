@@ -283,9 +283,15 @@ public class Butterfly : MonoBehaviour
             grounded = false;
             ResetRotation();
         }
-        else 
+        else if(landedOn.GetComponent<Flower>())
         {
             landedOn.GetComponent<Flower>().food--;
+        }
+        else
+        {
+            state = State.wander;
+            grounded = false;
+            ResetRotation();
         }
 
         isFeeding = false;

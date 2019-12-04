@@ -68,13 +68,15 @@ MonoBehaviour:
   gravity: 0.01
   flapY: 7.73
   flapX: 1.37
-  rotSpeed: 1
+  rotSpeed: 75
+  wanderRotSpeed: 50
   stomachCapactity: 0
   wanderFlapFreq: 1.5
-  targetingFlapBelowFreq: 0
-  targetingFlapAboveFreq: 0
+  targetingFlapBelowFreq: 1.2
+  targetingFlapAboveFreq: 1.8
   wingColour: {r: 0.70522445, g: 0.037646834, b: 0.8867924, a: 0}
   visionRange: 0
+  feedTime: 1
   state: 0
   stomachFill: 0
   right: 0
@@ -285,6 +287,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6507efd01d3667544841eeafd4a87970, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inTriggerList: []
 --- !u!135 &8044193395583944408
 SphereCollider:
   m_ObjectHideFlags: 0

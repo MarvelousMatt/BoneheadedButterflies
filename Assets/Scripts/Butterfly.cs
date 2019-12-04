@@ -38,12 +38,14 @@ public class Butterfly : MonoBehaviour
     public float flapY;
     public float flapX;
     public float rotSpeed;
+    public float wanderRotSpeed;
     public int stomachCapactity;
     public float wanderFlapFreq;
     public float targetingFlapBelowFreq;
     public float targetingFlapAboveFreq;
     public Color wingColour;
     public float visionRange;
+    public float feedTime;
 
 
     public enum State { wander, targeting, breeding, feeding };
@@ -67,15 +69,29 @@ public class Butterfly : MonoBehaviour
     //How often the butterfly flaps
     public float currentFlapTime;
 
+    //The instance of visionsphere attatched to this butterfly
     VisionSphere vision;
 
+    //What the butterfly is atop
+    GameObject landedOn;
 
+    //The default butterfly rotation, for resetting the angle of the butterfly
+    Quaternion defaultRot;
 
+    //Controls the flapping of the coroutine
+    bool flapActive = true;
+
+    //
+    bool isFeeding = false;
+
+    //
 
     // Start is called before the first frame update
     void Start()
     {
         StartCoroutine(FlapTimer());
+
+        defaultRot = transform.rotation;
 
         //Manipulate colour later
 
@@ -147,6 +163,7 @@ public class Butterfly : MonoBehaviour
                 Targeting();
                 break;
             case State.feeding:
+                Feeding();
                 break;
             case State.breeding:
                 break;
@@ -157,15 +174,20 @@ public class Butterfly : MonoBehaviour
     void Wander()
     {
 
-        currentFlapTime = wanderFlapFreq;
+        if(currentFlapTime != wanderFlapFreq)
+        {
+            currentFlapTime = wanderFlapFreq;
+            flapActive = true;
+        }
+
 
         if (right)
         {
-            transform.Rotate(new Vector3(0, rotSpeed, 0));
+            transform.Rotate(new Vector3(0, wanderRotSpeed * Time.deltaTime, 0));
         }
         else
         {
-            transform.Rotate(new Vector3(0, -rotSpeed, 0));
+            transform.Rotate(new Vector3(0, -wanderRotSpeed * Time.deltaTime, 0));
         }
 
         if (Random.Range(0, 100) > wanderNoTurnChance)
@@ -183,9 +205,14 @@ public class Butterfly : MonoBehaviour
     //Flaps and turns towards the object that's marked as a target
     void Targeting()
     {
-        Quaternion rotStore = transform.rotation;
-        transform.LookAt(currentTarget.transform.position);
-        transform.SetPositionAndRotation(transform.position, new Quaternion(rotStore.x, transform.rotation.y, rotStore.z, transform.rotation.w));
+        if (currentTarget == null)
+        {
+            state = State.wander;
+            return;
+        }  
+
+        Quaternion lookAngle = Quaternion.LookRotation(currentTarget.transform.position - transform.position);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, lookAngle, rotSpeed * Time.deltaTime);
 
         if (transform.position.y > currentTarget.transform.position.y)
         {
@@ -196,12 +223,31 @@ public class Butterfly : MonoBehaviour
             currentFlapTime = targetingFlapBelowFreq;
         }
 
-        
+        if (grounded && landedOn == currentTarget && landedOn.CompareTag("Flower"))
+        {
+            state = State.feeding;
+        }
+        else if(grounded && landedOn == currentTarget && landedOn.CompareTag("Breedable"))
+        {
+            state = State.breeding;
+        }
+
+    }
+
+    void ResetRotation()
+    {
+        transform.rotation = defaultRot;
     }
 
     //Sitting still and then taking off after eating
     void Feeding()
     {
+        flapActive = false;
+
+        if (!isFeeding)
+        {
+            StartCoroutine(FeedTimer());
+        }
 
     }
 
@@ -217,9 +263,33 @@ public class Butterfly : MonoBehaviour
         while (true)
         {
             //Extra 0.1f is added to balance out max being exclusive
-            yield return new WaitForSeconds(currentFlapTime + Random.Range(-flapTimeVariation,flapTimeVariation + 0.1f) );
-            Flap();
+            yield return new WaitForSeconds(currentFlapTime + Random.Range(-flapTimeVariation, flapTimeVariation + 0.1f));
+
+            if (flapActive)
+            {
+                Flap();
+            }
         }
+    }
+
+    IEnumerator FeedTimer()
+    {
+        isFeeding = true;
+        yield return new WaitForSeconds(feedTime);
+
+        if(landedOn == null)
+        {
+            state = State.wander;
+            grounded = false;
+            ResetRotation();
+        }
+        else 
+        {
+            landedOn.GetComponent<Flower>().food--;
+        }
+
+        isFeeding = false;
+
     }
 
     //Enacts gravity and moves the butterfly around
@@ -264,7 +334,7 @@ public class Butterfly : MonoBehaviour
             yVel = 0;
             xVel = 0;
             grounded = true;
-    
+            landedOn = other.gameObject;
         }
     }
 
@@ -273,7 +343,7 @@ public class Butterfly : MonoBehaviour
         if (!other.gameObject.CompareTag("Butterfly"))
         {
             grounded = false;
-
+            landedOn = null;
         }
     }
 

@@ -11,7 +11,7 @@ public class VisionSphere : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        //Is it food, breedable butterflies and is it not right next to us
+        //Is it food or breedable
         if (other.CompareTag("Breedable") || other.CompareTag("Flower"))
             inTriggerList.Add(other.gameObject);
     }
@@ -45,11 +45,11 @@ public class VisionSphere : MonoBehaviour
                 continue;
             }
 
-            if (!breedRequest && inTriggerList[i].CompareTag("Breedable"))
+            if (breedRequest && inTriggerList[i].CompareTag("Breedable") || inTriggerList[i].CompareTag("Flower"))
             {
                 possibleTargets.Add(inTriggerList[i]);
             }
-            else if (breedRequest && inTriggerList[i].CompareTag("Flower"))
+            else if (!breedRequest && inTriggerList[i].CompareTag("Flower"))
             {
                 possibleTargets.Add(inTriggerList[i]);
             }

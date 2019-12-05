@@ -20,7 +20,7 @@ public class Butterfly : MonoBehaviour
     public float wanderNoTurnChance = 98;
 
     //How many breed points are needed to enter the breed state (will move to sim manager in future)
-    int breedPointsNeeded = 3;
+    public int breedPointsNeeded = 3;
 
     [Header("Velocity Handling")]
     public float xVel;
@@ -81,7 +81,7 @@ public class Butterfly : MonoBehaviour
     //Controls the flapping of the coroutine
     bool flapActive = true;
 
-    //
+    //Is the feeding coroutine already active
     bool isFeeding = false;
 
     //
@@ -197,10 +197,16 @@ public class Butterfly : MonoBehaviour
             right = !right;
         }
 
-        
-        if(vision.RequestTarget(breedPoints <= breedPointsNeeded) != null && stomachFill < stomachCapactity / 2)
+        if(stomachFill < stomachCapactity / 2 && vision.RequestTarget(false) != null)
         {
-            currentTarget = vision.RequestTarget(breedPoints <= breedPointsNeeded);
+            currentTarget = vision.RequestTarget(false);
+            state = State.targeting;
+        }
+
+        
+        if(vision.RequestTarget(true) != null && vision.RequestTarget(true).CompareTag("Breedable") && breedPoints >= breedPointsNeeded)
+        {
+            currentTarget = vision.RequestTarget(true);
             state = State.targeting;
         }
         
@@ -230,6 +236,13 @@ public class Butterfly : MonoBehaviour
         if (grounded && landedOn == currentTarget && landedOn.CompareTag("Flower"))
         {
             state = State.feeding;
+            breedPoints++;
+
+            if (breedPoints >= breedPointsNeeded)
+            {
+                gameObject.tag = "Breedable";
+            }
+
         }
         else if(grounded && landedOn == currentTarget && landedOn.CompareTag("Breedable"))
         {

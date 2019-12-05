@@ -118,11 +118,13 @@ public class Butterfly : MonoBehaviour
         //Swapping between player and AI input
         if (isPlayer)
         {
+            flapActive = false;
             PlayerInput();
             
         }
         else
         {
+            flapActive = true;
             ButterflAI();
         }
         
@@ -142,12 +144,12 @@ public class Butterfly : MonoBehaviour
 
         if (Input.GetKey(KeyCode.A))
         {
-            transform.Rotate(new Vector3(0, -rotSpeed, 0));
+            transform.Rotate(new Vector3(0, -wanderRotSpeed * Time.deltaTime, 0));
         }
 
         if (Input.GetKey(KeyCode.D))
         {
-            transform.Rotate(new Vector3(0, rotSpeed, 0));
+            transform.Rotate(new Vector3(0, wanderRotSpeed * Time.deltaTime, 0));
         }
     }
 
@@ -195,11 +197,13 @@ public class Butterfly : MonoBehaviour
             right = !right;
         }
 
-        if(vision.RequestTarget(breedPoints <= breedPointsNeeded) != null)
+        
+        if(vision.RequestTarget(breedPoints <= breedPointsNeeded) != null && stomachFill < stomachCapactity / 2)
         {
             currentTarget = vision.RequestTarget(breedPoints <= breedPointsNeeded);
             state = State.targeting;
         }
+        
     }
 
     //Flaps and turns towards the object that's marked as a target
@@ -286,6 +290,17 @@ public class Butterfly : MonoBehaviour
         else if(landedOn.GetComponent<Flower>())
         {
             landedOn.GetComponent<Flower>().food--;
+            stomachFill++;
+
+            if(stomachFill >= stomachCapactity)
+            {
+                grounded = false;
+                stomachFill = stomachCapactity;
+                state = State.wander;
+                ResetRotation();
+            }
+
+
         }
         else
         {
@@ -315,6 +330,7 @@ public class Butterfly : MonoBehaviour
 
         if (xVel > 0)
         {
+
             xVel -= drag;
 
             if (xVel < 0)
@@ -326,6 +342,13 @@ public class Butterfly : MonoBehaviour
     //Adds the inherited flap values into velocity
     void Flap()
     {
+        stomachFill--;
+
+        if(stomachFill <= 0)
+        {
+            Destroy(gameObject);
+        }
+
         yVel = 0;
 
         yVel += flapY;

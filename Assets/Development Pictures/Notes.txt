@@ -1,0 +1,2 @@
+Stomach capacity negatively correlates with rotation speed
+Feed rate affects vision range

@@ -11,6 +11,8 @@ public class VisionSphere : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log("Seeing:" + other.gameObject.name);
+
         //Is it food or breedable
         if (other.CompareTag("Breedable") || other.CompareTag("Flower"))
             inTriggerList.Add(other.gameObject);

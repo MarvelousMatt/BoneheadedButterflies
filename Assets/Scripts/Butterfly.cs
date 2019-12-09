@@ -34,7 +34,7 @@ public class Butterfly : MonoBehaviour
     //Is the butterfly touching a landable surface
     bool grounded = false;
 
-    [Header ("Inherited Values")]
+    [Header("Inherited Values")]
     public float flapY;
     public float flapX;
     public float rotSpeed;
@@ -112,7 +112,7 @@ public class Butterfly : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.P))
         {
             isPlayer = !isPlayer;
-            
+
         }
 
         //Swapping between player and AI input
@@ -120,15 +120,15 @@ public class Butterfly : MonoBehaviour
         {
             flapActive = false;
             PlayerInput();
-            
+
         }
         else
         {
             flapActive = true;
             ButterflAI();
         }
-        
-        
+
+
         VelocityHandler();
 
 
@@ -176,7 +176,7 @@ public class Butterfly : MonoBehaviour
     void Wander()
     {
 
-        if(currentFlapTime != wanderFlapFreq)
+        if (currentFlapTime != wanderFlapFreq)
         {
             currentFlapTime = wanderFlapFreq;
             flapActive = true;
@@ -197,19 +197,19 @@ public class Butterfly : MonoBehaviour
             right = !right;
         }
 
-        if(stomachFill < stomachCapactity / 2 && vision.RequestTarget(false) != null)
+        if (stomachFill < stomachCapactity / 2 && vision.RequestTarget(false) != null)
         {
             currentTarget = vision.RequestTarget(false);
             state = State.targeting;
         }
 
-        
-        if(vision.RequestTarget(true) != null && vision.RequestTarget(true).CompareTag("Breedable") && breedPoints >= breedPointsNeeded)
+
+        if (vision.RequestTarget(true) != null && vision.RequestTarget(true).CompareTag("Breedable") && breedPoints >= breedPointsNeeded)
         {
             currentTarget = vision.RequestTarget(true);
             state = State.targeting;
         }
-        
+
     }
 
     //Flaps and turns towards the object that's marked as a target
@@ -219,7 +219,7 @@ public class Butterfly : MonoBehaviour
         {
             state = State.wander;
             return;
-        }  
+        }
 
         Quaternion lookAngle = Quaternion.LookRotation(currentTarget.transform.position - transform.position);
         transform.rotation = Quaternion.RotateTowards(transform.rotation, lookAngle, rotSpeed * Time.deltaTime);
@@ -233,7 +233,7 @@ public class Butterfly : MonoBehaviour
             currentFlapTime = targetingFlapBelowFreq;
         }
 
-        if (grounded && landedOn == currentTarget && landedOn.CompareTag("Flower"))
+        if (grounded && landedOn.transform.parent == currentTarget.transform.parent && landedOn.CompareTag("Flower"))
         {
             state = State.feeding;
             breedPoints++;
@@ -244,7 +244,7 @@ public class Butterfly : MonoBehaviour
             }
 
         }
-        else if(grounded && landedOn == currentTarget && landedOn.CompareTag("Breedable"))
+        else if (grounded && landedOn.transform.parent == currentTarget.transform.parent && landedOn.CompareTag("Breedable"))
         {
             state = State.breeding;
         }
@@ -294,18 +294,18 @@ public class Butterfly : MonoBehaviour
         isFeeding = true;
         yield return new WaitForSeconds(feedTime);
 
-        if(landedOn == null)
+        if (landedOn == null)
         {
             state = State.wander;
             grounded = false;
             ResetRotation();
         }
-        else if(landedOn.GetComponent<Flower>())
+        else if (landedOn.transform.GetComponentInChildren<Flower>())
         {
             landedOn.GetComponent<Flower>().food--;
             stomachFill++;
 
-            if(stomachFill >= stomachCapactity)
+            if (stomachFill >= stomachCapactity)
             {
                 grounded = false;
                 stomachFill = stomachCapactity;
@@ -357,7 +357,7 @@ public class Butterfly : MonoBehaviour
     {
         stomachFill--;
 
-        if(stomachFill <= 0)
+        if (stomachFill <= 0)
         {
             Destroy(gameObject);
         }
@@ -368,26 +368,27 @@ public class Butterfly : MonoBehaviour
         xVel += flapX;
     }
 
-
-    void OnTriggerEnter(Collider other)
+    void OnCollisionEnter(Collision collision)
     {
-        if (!other.gameObject.CompareTag("Butterfly"))
+        Debug.Log("Collided");
+
+        if (!collision.gameObject.CompareTag("Butterfly"))
         {
             yVel = 0;
             xVel = 0;
             grounded = true;
-            landedOn = other.gameObject;
+            landedOn = collision.gameObject;
         }
     }
 
-    void OnTriggerExit(Collider other)
+    void OnCollisionExit(Collision collision)
     {
-        if (!other.gameObject.CompareTag("Butterfly"))
+        if (!collision.gameObject.CompareTag("Butterfly"))
         {
             grounded = false;
             landedOn = null;
         }
-    }
 
+    }
 
 }

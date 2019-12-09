@@ -244,9 +244,11 @@ public class Butterfly : MonoBehaviour
             }
 
         }
-        else if (grounded && landedOn.transform.parent == currentTarget.transform.parent && landedOn.CompareTag("Breedable"))
+        else if (grounded && (landedOn.transform.GetChild(0).gameObject != null && landedOn.transform.GetChild(0).gameObject == currentTarget) && landedOn.transform.GetChild(0).CompareTag("Breedable"))
         {
             state = State.breeding;
+            flapActive = false;
+            ResetRotation();
         }
 
     }
@@ -370,25 +372,17 @@ public class Butterfly : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("Collided");
-
-        if (!collision.gameObject.CompareTag("Butterfly"))
-        {
-            yVel = 0;
-            xVel = 0;
-            grounded = true;
-            landedOn = collision.gameObject;
-        }
+        yVel = 0;
+        xVel = 0;
+        grounded = true;
+        landedOn = collision.gameObject;
+        Debug.Log(landedOn.name);
     }
 
     void OnCollisionExit(Collision collision)
     {
-        if (!collision.gameObject.CompareTag("Butterfly"))
-        {
-            grounded = false;
-            landedOn = null;
-        }
-
+        grounded = false;
+        landedOn = null;
     }
 
 }

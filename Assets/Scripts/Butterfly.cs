@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using MapValues;
+
 
 public class Butterfly : MonoBehaviour
 {
@@ -90,6 +92,11 @@ public class Butterfly : MonoBehaviour
         vision.gameObject.GetComponent<SphereCollider>().radius = visionRange;
 
         //Colour application for wings
+        wingColour.r = MapValuesExtension.Map(flapY,SimulationManager.instance.flapYMin, SimulationManager.instance.flapYMax, 0, 1);
+        wingColour.g = MapValuesExtension.Map(flapX, SimulationManager.instance.flapXMin, SimulationManager.instance.flapXMax, 0, 1);
+        wingColour.b = MapValuesExtension.Map(visionRange, SimulationManager.instance.visionRangeMin, SimulationManager.instance.visionRangeMax, 0, 1);
+        wingColour.a = MapValuesExtension.Map(eggCost, SimulationManager.instance.eggCostMin, SimulationManager.instance.eggCostMax, 0, 1);
+
         Renderer rend = transform.GetChild(0).GetComponent<Renderer>();
 
         Material[] materials = rend.materials;

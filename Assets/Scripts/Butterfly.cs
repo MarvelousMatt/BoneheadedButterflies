@@ -8,20 +8,6 @@ public class Butterfly : MonoBehaviour
     //Player control values
     bool isPlayer = false;
 
-    [Header("Global Restrictions")]
-    //Global butterfly restrictions ( will move to sim manager in future)
-    float maxVelocityLimit = 0.5f;
-    float minVelocityLimit = -0.5f;
-
-    public float flapTimeVariation = 0.5f;
-
-    //Chance for the butterfly to not turn every frame while wandering
-    [Range(0, 100)]
-    public float wanderNoTurnChance = 98;
-
-    //How many breed points are needed to enter the breed state (will move to sim manager in future)
-    public int breedPointsNeeded = 3;
-
     [Header("Velocity Handling")]
     public float xVel;
     public float yVel;
@@ -46,6 +32,9 @@ public class Butterfly : MonoBehaviour
     public Color wingColour;
     public float visionRange;
     public float feedTime;
+    public float eggHatchTime;
+    public int eggCost;
+    public int childNumber;
 
 
     public enum State { wander, targeting, breeding, feeding };
@@ -91,11 +80,14 @@ public class Butterfly : MonoBehaviour
     {
         StartCoroutine(FlapTimer());
 
+        
+
         defaultRot = transform.rotation;
 
         //Manipulate colour later
 
         vision = transform.GetComponentInChildren<VisionSphere>();
+        vision.gameObject.GetComponent<SphereCollider>().radius = visionRange;
 
         //Colour application for wings
         Renderer rend = transform.GetChild(0).GetComponent<Renderer>();
@@ -168,6 +160,7 @@ public class Butterfly : MonoBehaviour
                 Feeding();
                 break;
             case State.breeding:
+                Breeding();
                 break;
         }
     }
@@ -192,10 +185,20 @@ public class Butterfly : MonoBehaviour
             transform.Rotate(new Vector3(0, -wanderRotSpeed * Time.deltaTime, 0));
         }
 
-        if (Random.Range(0, 100) > wanderNoTurnChance)
+        if (Random.Range(0, 100) > SimulationManager.instance.wanderNoTurnChance)
         {
             right = !right;
         }
+
+        if(breedPoints >= SimulationManager.instance.breedPointsNeeded)
+        {
+            transform.GetChild(0).tag = "Breedable";
+        }
+        else
+        {
+            transform.GetChild(0).tag = "Untagged";
+        }
+
 
         if (stomachFill < stomachCapactity / 2 && vision.RequestTarget(false) != null)
         {
@@ -204,7 +207,7 @@ public class Butterfly : MonoBehaviour
         }
 
 
-        if (vision.RequestTarget(true) != null && vision.RequestTarget(true).CompareTag("Breedable") && breedPoints >= breedPointsNeeded)
+        if (vision.RequestTarget(true) != null && vision.RequestTarget(true).CompareTag("Breedable") && breedPoints >= SimulationManager.instance.breedPointsNeeded && vision.RequestTarget(true) != transform.GetChild(0).gameObject)
         {
             currentTarget = vision.RequestTarget(true);
             state = State.targeting;
@@ -218,6 +221,7 @@ public class Butterfly : MonoBehaviour
         if (currentTarget == null)
         {
             state = State.wander;
+            ResetRotation();
             return;
         }
 
@@ -233,22 +237,26 @@ public class Butterfly : MonoBehaviour
             currentFlapTime = targetingFlapBelowFreq;
         }
 
-        if (grounded && landedOn.transform.parent == currentTarget.transform.parent && landedOn.CompareTag("Flower"))
+        if (grounded && landedOn.CompareTag("Flower"))
         {
             state = State.feeding;
             breedPoints++;
 
-            if (breedPoints >= breedPointsNeeded)
+            if (breedPoints >= SimulationManager.instance.breedPointsNeeded)
             {
                 gameObject.tag = "Breedable";
             }
 
         }
-        else if (grounded && (landedOn.transform.GetChild(0).gameObject != null && landedOn.transform.GetChild(0).gameObject == currentTarget) && landedOn.transform.GetChild(0).CompareTag("Breedable"))
+        else if (grounded && landedOn.transform.childCount > 0) 
         {
-            state = State.breeding;
-            flapActive = false;
-            ResetRotation();
+            if  (landedOn.transform.GetChild(0).gameObject == currentTarget && landedOn.transform.GetChild(0).CompareTag("Breedable"))
+            {
+                state = State.breeding;
+                flapActive = false;
+                ResetRotation();
+            }
+  
         }
 
     }
@@ -273,8 +281,32 @@ public class Butterfly : MonoBehaviour
     //Creating children (and possibly laying them)
     void Breeding()
     {
+        //Get stats from both butterflies
+        //Disable other butterfly
+        //create eggs with stats from both
+        //egg hatches after a time
 
+        Butterfly other = currentTarget.GetComponentInParent<Butterfly>();
+        
+        //Possibly move this to a function on other butterfly?
+        other.breedPoints -= SimulationManager.instance.breedPointsNeeded;
+        other.state = State.wander;
+        other.stomachFill -= eggCost;
+        other.flapActive = true;
+        other.currentTarget = null;
+
+        breedPoints -= SimulationManager.instance.breedPointsNeeded;
+        stomachFill -= eggCost;
+        state = State.wander;
+        flapActive = true;
+        currentTarget = null;
+
+        GameObject egg = Instantiate(SimulationManager.instance.eggPrefab,transform.position + transform.up,Quaternion.identity);
+        egg.GetComponent<Egg>().SetParents(this,other);
+
+        
     }
+
 
     //Keeps the butterfly flapping. CurrentFlapTime is altered when the butterfly's state is changed
     IEnumerator FlapTimer()
@@ -282,7 +314,7 @@ public class Butterfly : MonoBehaviour
         while (true)
         {
             //Extra 0.1f is added to balance out max being exclusive
-            yield return new WaitForSeconds(currentFlapTime + Random.Range(-flapTimeVariation, flapTimeVariation + 0.1f));
+            yield return new WaitForSeconds(currentFlapTime + Random.Range(-SimulationManager.instance.flapTimeVariation, SimulationManager.instance.flapTimeVariation + 0.1f));
 
             if (flapActive)
             {
@@ -332,8 +364,8 @@ public class Butterfly : MonoBehaviour
     void VelocityHandler()
     {
         //Restriction on butterfly max speed
-        xVel = Mathf.Clamp(xVel, minVelocityLimit, maxVelocityLimit);
-        yVel = Mathf.Clamp(yVel, minVelocityLimit, maxVelocityLimit);
+        xVel = Mathf.Clamp(xVel, SimulationManager.instance.minVelocityLimit, SimulationManager.instance.maxVelocityLimit);
+        yVel = Mathf.Clamp(yVel, SimulationManager.instance.minVelocityLimit, SimulationManager.instance.maxVelocityLimit);
 
         transform.position += transform.forward * xVel;
         transform.position += transform.up * yVel;
@@ -364,10 +396,15 @@ public class Butterfly : MonoBehaviour
             Destroy(gameObject);
         }
 
-        yVel = 0;
+        if(transform.position.y < SimulationManager.instance.yLimit)
+        {
 
-        yVel += flapY;
-        xVel += flapX;
+            yVel = 0;
+
+            yVel += flapY;
+            xVel += flapX;
+        }
+
     }
 
     void OnCollisionEnter(Collision collision)

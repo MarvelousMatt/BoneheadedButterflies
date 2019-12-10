@@ -13,7 +13,7 @@ public class VisionSphere : MonoBehaviour
     {
 
         //Is it food or breedable
-        if (other.CompareTag("Breedable") || other.CompareTag("Flower"))
+        if (other.gameObject.transform != transform.parent.GetChild(0) && other.CompareTag("Breedable") || other.CompareTag("Flower"))
         {
             inTriggerList.Add(other.gameObject);
         }
@@ -22,12 +22,9 @@ public class VisionSphere : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        for (int i = 0; i < inTriggerList.Count; i++)
+        if (inTriggerList.Contains(other.gameObject))
         {
-            if (inTriggerList.Contains(other.gameObject))
-            {
-                inTriggerList.Remove(other.gameObject);
-            }
+            inTriggerList.Remove(other.gameObject);
         }
     }
 
@@ -62,7 +59,7 @@ public class VisionSphere : MonoBehaviour
 
         if (possibleTargets.Count > 0)
         {
-            return possibleTargets[0];
+            return possibleTargets[Random.Range(0,possibleTargets.Count)];
         }
         else
         {

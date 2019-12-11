@@ -60,11 +60,34 @@ public class SimulationManager : MonoBehaviour
     public int childNumberMin;
     public int childNumberMax;
 
+    public float xBoundary = 250;
+    public float zBoundary = 250;
+
+    public float maxFlowerY = 50;
+
+    public int maxFlowers;
+
+    public float flowerSpawnRate;
+
+    public float flowerSpawnAmount;
+
+    public bool spawnFlowers = true;
+
+    public int flowerFoodValue = 10;
+
+    public int initialFlowers = 50;
+
+    public GameObject eggPrefab;
+    public GameObject butterflyPrefab;
+    public GameObject flowerPrefab;
 
 
     public static SimulationManager instance;
 
     float timeScale = 1;
+
+
+    public List<GameObject> flowers = new List<GameObject>();
 
     void Awake()
     {
@@ -76,23 +99,14 @@ public class SimulationManager : MonoBehaviour
         {
             Destroy(this);
         }
-    }
 
-    public GameObject eggPrefab;
-    public GameObject butterflyPrefab;
+        StartCoroutine(FlowerSpawnPulse());
 
+        for (int i = 0; i < initialFlowers; i++)
+        {
+            CreateFlower();
+        }
 
-
-
-
-    //Max velocity
-    //Breed points required
-
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
     }
 
     // Update is called once per frame
@@ -107,5 +121,39 @@ public class SimulationManager : MonoBehaviour
         {
             Time.timeScale = timeScale - 0.1f;
         }
+
     }
+
+    IEnumerator FlowerSpawnPulse()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(flowerSpawnRate);
+
+            if (spawnFlowers && flowers.Count < maxFlowers)
+            {
+                for (int i = 0; i < flowerSpawnAmount; i++)
+                {
+                    if (flowers.Count > maxFlowers)
+                    {
+                        break;
+                    }
+
+                    CreateFlower();
+                }
+            }
+
+        }
+    }
+
+    public void CreateFlower()
+    {
+        Vector3 spawnPos = new Vector3(Random.Range(-xBoundary,xBoundary),Random.Range(0,maxFlowerY),Random.Range(-zBoundary,zBoundary));
+        Flower newFlower = Instantiate(flowerPrefab, spawnPos, Quaternion.identity).GetComponentInChildren<Flower>();
+        newFlower.food = (int)flowerFoodValue;
+        flowers.Add(newFlower.gameObject.transform.parent.gameObject);
+
+    }
+
+
 }

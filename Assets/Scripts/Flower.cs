@@ -22,20 +22,10 @@ public class Flower : MonoBehaviour
 
             if(foodAmount <= 0)
             {
+                SimulationManager.instance.flowers.Remove(transform.parent.gameObject);
                 Destroy(transform.parent.gameObject);
             }
         }
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

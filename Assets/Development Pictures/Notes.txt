@@ -2,3 +2,21 @@ Stomach capacity and vision range
 Egg cost affects amount of children
 Longer time spent in egg gives more initial food
 Feed rate and speed
+Bonus breed points for fewer children
+
+Butterflies collide and create eggX
+Global stat limits and butterfly generationX
+Egg falls to the ground and waits before spawning butterflyX
+Add meta controls for simulationX
+Test sustainability by adding flowers manuallyX
+Put soft boundaries on edge of mapX
+Spawn flowers automaticallyX
+
+Add stat correlation
+Set up default area
+Add meta controls
+Clean up visually
+Add butterfly limits
+fix inheritance bug
+
+

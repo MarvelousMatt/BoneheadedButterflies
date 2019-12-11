@@ -244,6 +244,9 @@ public class Butterfly : MonoBehaviour
             currentFlapTime = targetingFlapBelowFreq;
         }
 
+        if (landedOn == null)
+            return;
+
         if (grounded && landedOn.CompareTag("Flower"))
         {
             state = State.feeding;
@@ -374,6 +377,12 @@ public class Butterfly : MonoBehaviour
         xVel = Mathf.Clamp(xVel, SimulationManager.instance.minVelocityLimit, SimulationManager.instance.maxVelocityLimit);
         yVel = Mathf.Clamp(yVel, SimulationManager.instance.minVelocityLimit, SimulationManager.instance.maxVelocityLimit);
 
+        if (transform.position.x > SimulationManager.instance.xBoundary || transform.position.x < -SimulationManager.instance.xBoundary
+            || transform.position.z > SimulationManager.instance.zBoundary || transform.position.z < -SimulationManager.instance.zBoundary)
+        {
+            xVel = -xVel;
+        }
+
         transform.position += transform.forward * xVel;
         transform.position += transform.up * yVel;
 
@@ -420,7 +429,6 @@ public class Butterfly : MonoBehaviour
         xVel = 0;
         grounded = true;
         landedOn = collision.gameObject;
-        Debug.Log(landedOn.name);
     }
 
     void OnCollisionExit(Collision collision)

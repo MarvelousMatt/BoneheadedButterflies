@@ -122,12 +122,12 @@ public class SimulationManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.T))
         {
-            Time.timeScale = timeScale + 0.1f;
+            Time.timeScale = (timeScale += 0.1f);
         }
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            Time.timeScale = timeScale - 0.1f;
+            Time.timeScale = (timeScale -= 0.1f);
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))

@@ -11,12 +11,12 @@ Add meta controls for simulationX
 Test sustainability by adding flowers manuallyX
 Put soft boundaries on edge of mapX
 Spawn flowers automaticallyX
+fix inheritance bugX
+Set up default areaX
 
 Add stat correlation
-Set up default area
 Add meta controls
 Clean up visually
 Add butterfly limits
-fix inheritance bug
 
 

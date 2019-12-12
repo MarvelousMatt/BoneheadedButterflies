@@ -43,14 +43,34 @@ public class Egg : MonoBehaviour
 
         if (hasParents)
         {
-            for (int i = 0; i < childNumber; i++)
+            if (SimulationManager.instance.butterflies.Count + childNumber > SimulationManager.instance.maxButterflies)
             {
-                Generate();
+                Destroy(gameObject);
+                StopAllCoroutines();
             }
+            else
+            {
+                for (int i = 0; i < childNumber; i++)
+                {
+                    Generate();
+                }
+            }
+
+
         }
         else
         {
-            Generate();
+            if (SimulationManager.instance.butterflies.Count + 1 > SimulationManager.instance.maxButterflies)
+            {
+                Destroy(gameObject);
+                StopAllCoroutines();
+            }
+            else
+            {
+                Generate();
+            }
+
+
         }
 
 
@@ -93,6 +113,8 @@ public class Egg : MonoBehaviour
 
             child.stomachFill = (int)(child.stomachCapactity * 0.25f);
 
+            SimulationManager.instance.butterflies.Add(child.gameObject);
+
         }
         else
         {
@@ -105,7 +127,7 @@ public class Egg : MonoBehaviour
            
             for (int i = 0; i < statRoll.Length; i++)
             {
-                statRoll[i] = (Random.Range(0, 1) != 0);
+                statRoll[i] = (Random.Range(0, 2) != 0);
             }
 
             //Turning butterflies into stats to be swapped between
@@ -133,6 +155,8 @@ public class Egg : MonoBehaviour
             Butterfly child = Instantiate(SimulationManager.instance.butterflyPrefab, transform.position, Quaternion.identity).GetComponent<Butterfly>();
 
             ArrayToButterfly(childStats,child);
+
+            SimulationManager.instance.butterflies.Add(child.gameObject);
         }
     }
 

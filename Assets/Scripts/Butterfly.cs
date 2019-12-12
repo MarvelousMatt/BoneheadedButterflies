@@ -437,4 +437,10 @@ public class Butterfly : MonoBehaviour
         landedOn = null;
     }
 
+    void OnDestroy()
+    {
+        if (SimulationManager.instance.butterflies.Contains(gameObject))
+            SimulationManager.instance.butterflies.Remove(gameObject);
+    }
+
 }

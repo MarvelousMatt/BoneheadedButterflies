@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SimulationManager : MonoBehaviour
 {
@@ -8,11 +9,13 @@ public class SimulationManager : MonoBehaviour
 
 
     [Header("Global Restrictions")]
-    //Global butterfly restrictions ( will move to sim manager in future)
     public float maxVelocityLimit = 0.5f;
     public float minVelocityLimit = -0.5f;
     public float yLimit = 100;
     public float flapTimeVariation = 0.5f;
+    public int maxButterflies = 100;
+
+    public List<GameObject> butterflies = new List<GameObject>();
 
     //Chance for the butterfly to not turn every frame while wandering
     [Range(0, 100)]
@@ -77,6 +80,8 @@ public class SimulationManager : MonoBehaviour
 
     public int initialFlowers = 50;
 
+    public float objectSpawnAreaModifier = 10;
+
     public GameObject eggPrefab;
     public GameObject butterflyPrefab;
     public GameObject flowerPrefab;
@@ -86,6 +91,9 @@ public class SimulationManager : MonoBehaviour
 
     float timeScale = 1;
 
+    //UI stuff
+    public int eggSpawnNo;
+    public int flowerSpawnNo;
 
     public List<GameObject> flowers = new List<GameObject>();
 
@@ -122,6 +130,10 @@ public class SimulationManager : MonoBehaviour
             Time.timeScale = timeScale - 0.1f;
         }
 
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
     }
 
     IEnumerator FlowerSpawnPulse()
@@ -146,14 +158,46 @@ public class SimulationManager : MonoBehaviour
         }
     }
 
-    public void CreateFlower()
+    void CreateFlower()
     {
-        Vector3 spawnPos = new Vector3(Random.Range(-xBoundary,xBoundary),Random.Range(0,maxFlowerY),Random.Range(-zBoundary,zBoundary));
+        Vector3 spawnPos = new Vector3(Random.Range(-xBoundary + objectSpawnAreaModifier,xBoundary - objectSpawnAreaModifier),Random.Range(0,maxFlowerY),Random.Range(-zBoundary + objectSpawnAreaModifier,zBoundary - objectSpawnAreaModifier));
         Flower newFlower = Instantiate(flowerPrefab, spawnPos, Quaternion.identity).GetComponentInChildren<Flower>();
         newFlower.food = (int)flowerFoodValue;
         flowers.Add(newFlower.gameObject.transform.parent.gameObject);
-
     }
 
+    void CreateEgg()
+    {
+        Vector3 spawnPos = new Vector3(Random.Range(-xBoundary + objectSpawnAreaModifier, xBoundary - objectSpawnAreaModifier), Random.Range(0, 5), Random.Range(-zBoundary + objectSpawnAreaModifier, zBoundary - objectSpawnAreaModifier));
+        Instantiate(eggPrefab, spawnPos, Quaternion.identity);
+    }
+
+    public void ButtonSpawn(bool isEgg)
+    {
+        if (isEgg)
+        {
+            for (int i = 0; i < eggSpawnNo; i++)
+            {
+                CreateEgg();
+            }
+        }
+        else
+        {
+            for (int i = 0; i < flowerSpawnNo; i++)
+            {
+                CreateFlower();
+            }
+        }
+    }
+
+    public void UpdateSpawnNumber(GameObject input)
+    {
+        if (input.name == "EggInput")
+            eggSpawnNo = int.Parse(input.GetComponent<InputField>().text);
+        else
+        {
+            flowerSpawnNo = int.Parse(input.GetComponent<InputField>().text);
+        }
+    }
 
 }

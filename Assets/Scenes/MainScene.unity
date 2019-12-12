@@ -214,9 +214,9 @@ RectTransform:
   m_Father: {fileID: 1388508042}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -410.2, y: 29.1}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 101.79999, y: 29.1}
   m_SizeDelta: {x: 200, y: 325}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &176934015
@@ -673,9 +673,9 @@ RectTransform:
   m_Father: {fileID: 1388508042}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -411, y: -217}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 101, y: 51}
   m_SizeDelta: {x: 200, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &783642589
@@ -908,9 +908,9 @@ RectTransform:
   m_Father: {fileID: 1388508042}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 356, y: 157}
+  m_AnchorMin: {x: 1, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: -156, y: 157}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1159629826
@@ -1117,9 +1117,9 @@ RectTransform:
   m_Father: {fileID: 1388508042}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 356, y: 98}
+  m_AnchorMin: {x: 1, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: -156, y: 98}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1256705331
@@ -1373,19 +1373,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Butterflies:
-
-    Left Click Butterfly: View Butterfly Details
-
-    Space: Flap (While controlling butterfly)
-
-    A : Turn Left (While controlling butterfly)
-
-    D: Turn Right(While controlling butterfly)
-
-
-
-    Camera:
+  m_Text: 'Camera:
 
     WASD: Move
 
@@ -1644,9 +1632,9 @@ RectTransform:
   m_Father: {fileID: 1388508042}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -37, y: 259}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 475, y: -9}
   m_SizeDelta: {x: 950, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1436052236
@@ -2400,7 +2388,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Created by Matthew Jenkins\n\nProject files available soon at:\nMatthewJenkins.Portfolio.Site\n\n\xA9
+  m_Text: "Created by Matthew Jenkins\n\nProject files + More info:\nMatthewJenkins.Portfolio.Site\n\n\xA9
     Matthew Jenkins, 2019"
 --- !u!222 &1685138927
 CanvasRenderer:
@@ -2443,7 +2431,8 @@ MonoBehaviour:
   minVelocityLimit: -0.5
   yLimit: 100
   flapTimeVariation: 0.5
-  realisticRotation: 0
+  maxButterflies: 100
+  butterflies: []
   wanderNoTurnChance: 98
   breedPointsNeeded: 2
   flapYMin: 1

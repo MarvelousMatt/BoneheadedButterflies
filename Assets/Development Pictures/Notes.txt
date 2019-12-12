@@ -15,8 +15,12 @@ fix inheritance bugX
 Set up default areaX
 
 Add stat correlation
-Add meta controls
-Clean up visually
-Add butterfly limits
+Add butterfly controls
+
+Butterflies:
+Left Click Butterfly: View Butterfly Details
+Space: Flap (While controlling butterfly)
+A : Turn Left (While controlling butterfly)
+D: Turn Right(While controlling butterfly)
 
 

@@ -4,15 +4,18 @@ Longer time spent in egg gives more initial food
 Feed rate and speed
 Bonus breed points for fewer children
 
-Butterflies collide and create eggX
-Global stat limits and butterfly generationX
-Egg falls to the ground and waits before spawning butterflyX
-Add meta controls for simulationX
-Test sustainability by adding flowers manuallyX
-Put soft boundaries on edge of mapX
-Spawn flowers automaticallyX
-fix inheritance bugX
-Set up default areaX
+Add controls
+
+clean up code
+
+make sim manager stuff static
+
+add simulation options
+
+add advantages and mutation
+
+performance
+
 
 Add stat correlation
 Add butterfly controls

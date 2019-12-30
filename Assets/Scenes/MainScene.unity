@@ -675,8 +675,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 101, y: 51}
-  m_SizeDelta: {x: 200, y: 100}
+  m_AnchoredPosition: {x: 101, y: 60.3}
+  m_SizeDelta: {x: 200, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &783642589
 MonoBehaviour:
@@ -2359,8 +2359,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 49.99994, y: 0}
-  m_SizeDelta: {x: 300, y: 100}
+  m_AnchoredPosition: {x: 49.99994, y: -4.5}
+  m_SizeDelta: {x: 300, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1685138926
 MonoBehaviour:
@@ -2395,8 +2395,8 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Created by Matthew Jenkins\n\nProject files + More info:\nMatthewJenkins.Portfolio.Site\n\n\xA9
-    Matthew Jenkins, 2019"
+  m_Text: "Created by Matthew Jenkins\n(Free cam by ashleydavis)\n\nProject files
+    + More info:\nMatthewJenkins.Portfolio.Site\n\n\xA9 Matthew Jenkins, 2019"
 --- !u!222 &1685138927
 CanvasRenderer:
   m_ObjectHideFlags: 0

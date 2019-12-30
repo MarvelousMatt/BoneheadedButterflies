@@ -42,8 +42,8 @@ public class Butterfly : MonoBehaviour
     public enum State { wander, targeting, breeding, feeding };
     [Header("AI Values")]
 
-    public State state = State.wander;
     //Enum for main AI states
+    public State state = State.wander;
 
     //How full the butterfly's stomach is
     public int stomachFill;
@@ -63,7 +63,7 @@ public class Butterfly : MonoBehaviour
     //The instance of visionsphere attatched to this butterfly
     VisionSphere vision;
 
-    //What the butterfly is atop
+    //What the butterfly is currently sitting on
     GameObject landedOn;
 
     //The default butterfly rotation, for resetting the angle of the butterfly
@@ -75,24 +75,24 @@ public class Butterfly : MonoBehaviour
     //Is the feeding coroutine already active
     bool isFeeding = false;
 
-    //
+    //can this butterfly breed
+    bool isBreedable = false;
 
     // Start is called before the first frame update
     void Start()
     {
+        //Beginning the flap coroutine. This will continue to run while the butterfly lives
         StartCoroutine(FlapTimer());
 
-        
-
+        //Setting the default rotation for this butterfly
         defaultRot = transform.rotation;
 
-        //Manipulate colour later
-
+        //Finding this butterflies' vision sphere and sizing it
         vision = transform.GetComponentInChildren<VisionSphere>();
         vision.gameObject.GetComponent<SphereCollider>().radius = visionRange;
 
-        //Colour application for wings
-        wingColour.r = MapValuesExtension.Map(flapY,SimulationManager.instance.flapYMin, SimulationManager.instance.flapYMax, 0, 1);
+        //Colour application for wings. Done by mapping the y flap, x flap, vision range and egg cost
+        wingColour.r = MapValuesExtension.Map(flapY, SimulationManager.instance.flapYMin, SimulationManager.instance.flapYMax, 0, 1);
         wingColour.g = MapValuesExtension.Map(flapX, SimulationManager.instance.flapXMin, SimulationManager.instance.flapXMax, 0, 1);
         wingColour.b = MapValuesExtension.Map(visionRange, SimulationManager.instance.visionRangeMin, SimulationManager.instance.visionRangeMax, 0, 1);
         wingColour.a = MapValuesExtension.Map(eggCost, SimulationManager.instance.eggCostMin, SimulationManager.instance.eggCostMax, 0, 1);
@@ -111,7 +111,6 @@ public class Butterfly : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.P))
         {
             isPlayer = !isPlayer;
-
         }
 
         //Swapping between player and AI input
@@ -127,10 +126,7 @@ public class Butterfly : MonoBehaviour
             ButterflAI();
         }
 
-
         VelocityHandler();
-
-
     }
 
     //Allows the player to directly control a selected butterfly
@@ -152,9 +148,11 @@ public class Butterfly : MonoBehaviour
         }
     }
 
-    //Base state machine setup
+    //Finite state machine that runs every frame to determine what the butterfly does
     void ButterflAI()
     {
+        isBreedable = IsBreedableCheck();
+
         switch (state)
         {
             case State.wander:
@@ -172,52 +170,88 @@ public class Butterfly : MonoBehaviour
         }
     }
 
-    //Random flapping and turning until the butterfly sees something interesting
-    void Wander()
+    void ChangeState(State input)
     {
+        state = input;
 
-        if (currentFlapTime != wanderFlapFreq)
+        if (input == State.wander)
         {
+            ResetRotation();
             currentFlapTime = wanderFlapFreq;
             flapActive = true;
         }
 
-
-        if (right)
+        if(input == State.feeding)
         {
-            transform.Rotate(new Vector3(0, wanderRotSpeed * Time.deltaTime, 0));
-        }
-        else
-        {
-            transform.Rotate(new Vector3(0, -wanderRotSpeed * Time.deltaTime, 0));
+            flapActive = false;
+            breedPoints++;
         }
 
-        if (Random.Range(0, 100) > SimulationManager.instance.wanderNoTurnChance)
+        if(input == State.breeding)
         {
-            right = !right;
+            flapActive = false;
+            ResetRotation();
         }
 
-        if(breedPoints >= SimulationManager.instance.breedPointsNeeded)
+
+
+    }
+
+    void ResetRotation()
+    {
+        transform.rotation = defaultRot;
+    }
+
+    bool IsBreedableCheck()
+    {
+        if (breedPoints >= SimulationManager.instance.breedPointsNeeded)
         {
             transform.GetChild(0).tag = "Breedable";
+            return true;
         }
         else
         {
             transform.GetChild(0).tag = "Untagged";
+            return false;
         }
 
+    }
 
-        if (stomachFill < stomachCapactity / 2 && vision.RequestTarget(false) != null)
-        {
-            currentTarget = vision.RequestTarget(false);
-            state = State.targeting;
-        }
+    //Random flapping and turning until the butterfly sees something interesting
+    void Wander()
+    {
+        //Determining rotation direction
+        if (Random.Range(0, 100) > SimulationManager.instance.wanderNoTurnChance)
+            right = !right;
+
+        if (right)
+            transform.Rotate(new Vector3(0, wanderRotSpeed * Time.deltaTime, 0));
+        else
+            transform.Rotate(new Vector3(0, -wanderRotSpeed * Time.deltaTime, 0));
+
+        //Testing if we can see anything via the VisionSphere while inputting breedability information
+        GameObject possibleTarget = vision.RequestTarget(isBreedable);
+
+        if (possibleTarget == null)
+            return;
+
+        bool hungry = stomachFill < stomachCapactity / 2;
 
 
-        if (vision.RequestTarget(true) != null && vision.RequestTarget(true).CompareTag("Breedable") && breedPoints >= SimulationManager.instance.breedPointsNeeded && vision.RequestTarget(true) != transform.GetChild(0).gameObject)
+        //If the found target and us are breedable,  and it isn't the body of this butterfly, we swap to target
+        if (possibleTarget.CompareTag("Breedable") && isBreedable && possibleTarget != transform.GetChild(0).gameObject)
         {
             currentTarget = vision.RequestTarget(true);
-            state = State.targeting;
+            ChangeState(State.targeting);
+            return;
+        }
+
+        //Find flowers if we can't breed
+        if (hungry && possibleTarget.CompareTag("Flower"))
+        {
+            currentTarget = possibleTarget;
+            ChangeState(State.targeting);
+            return;
         }
 
     }
@@ -227,53 +261,29 @@ public class Butterfly : MonoBehaviour
     {
         if (currentTarget == null)
         {
-            state = State.wander;
-            ResetRotation();
+            ChangeState(State.wander);
             return;
         }
 
+        //Rotates the butterfly toward its target
         Quaternion lookAngle = Quaternion.LookRotation(currentTarget.transform.position - transform.position);
         transform.rotation = Quaternion.RotateTowards(transform.rotation, lookAngle, rotSpeed * Time.deltaTime);
 
+        //Swapping out flap times for above and below. This ensures less flaps when above and more when below
         if (transform.position.y > currentTarget.transform.position.y)
-        {
             currentFlapTime = targetingFlapAboveFreq;
-        }
         else
-        {
             currentFlapTime = targetingFlapBelowFreq;
-        }
 
-        if (landedOn == null)
+
+        if (landedOn == null || landedOn.CompareTag("Untagged") || !grounded)
             return;
 
-        if (grounded && landedOn.CompareTag("Flower"))
-        {
-            state = State.feeding;
-            breedPoints++;
+        if (landedOn.CompareTag("Flower"))
+            ChangeState(State.feeding);
 
-            if (breedPoints >= SimulationManager.instance.breedPointsNeeded)
-            {
-                gameObject.tag = "Breedable";
-            }
-
-        }
-        else if (grounded && landedOn.transform.childCount > 0) 
-        {
-            if  (landedOn.transform.GetChild(0).gameObject == currentTarget && landedOn.transform.GetChild(0).CompareTag("Breedable"))
-            {
-                state = State.breeding;
-                flapActive = false;
-                ResetRotation();
-            }
-  
-        }
-
-    }
-
-    void ResetRotation()
-    {
-        transform.rotation = defaultRot;
+        else if (landedOn.CompareTag("Butterfly") && landedOn.transform.GetChild(0).gameObject == currentTarget && landedOn.transform.GetChild(0).CompareTag("Breedable")) 
+            ChangeState(State.breeding);
     }
 
     //Sitting still and then taking off after eating
@@ -300,14 +310,14 @@ public class Butterfly : MonoBehaviour
         
         //Possibly move this to a function on other butterfly?
         other.breedPoints -= SimulationManager.instance.breedPointsNeeded;
-        other.state = State.wander;
+        other.ChangeState(State.wander);
         other.stomachFill -= eggCost;
         other.flapActive = true;
         other.currentTarget = null;
 
         breedPoints -= SimulationManager.instance.breedPointsNeeded;
         stomachFill -= eggCost;
-        state = State.wander;
+        ChangeState(State.wander);
         flapActive = true;
         currentTarget = null;
 
@@ -340,7 +350,7 @@ public class Butterfly : MonoBehaviour
 
         if (landedOn == null)
         {
-            state = State.wander;
+            ChangeState(State.wander);
             grounded = false;
             ResetRotation();
         }
@@ -353,7 +363,7 @@ public class Butterfly : MonoBehaviour
             {
                 grounded = false;
                 stomachFill = stomachCapactity;
-                state = State.wander;
+                ChangeState(State.wander);
                 ResetRotation();
             }
 
@@ -361,7 +371,7 @@ public class Butterfly : MonoBehaviour
         }
         else
         {
-            state = State.wander;
+            ChangeState(State.wander);
             grounded = false;
             ResetRotation();
         }
